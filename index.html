@@ -26,15 +26,15 @@
 
     .button-group {
       display: flex;
-      flex-wrap: wrap;
       gap: 0.5rem;
       margin-bottom: 1rem;
+      flex-wrap: wrap;
     }
 
     .button-group button {
-      flex: 1 1 100%;
-      padding: 1rem;
-      font-size: 1.25rem;
+      flex: 1 1 auto;
+      padding: 0.75rem 1rem;
+      font-size: 1.1rem;
     }
 
     .content {
@@ -158,14 +158,36 @@
     loadCSV('data/tab2.csv', 'table2');
     loadCSV('data/tab3.csv', 'table3');
 
+    function showTable(tableId) {
+      document.querySelectorAll('.table-container').forEach(div => div.classList.add('d-none'));
+      document.getElementById(tableId).classList.remove('d-none');
+
+      document.querySelectorAll('.button-group button').forEach(btn => {
+        if (btn.getAttribute('data-table') === tableId) {
+          btn.classList.add('active');
+        } else {
+          btn.classList.remove('active');
+        }
+      });
+
+      history.replaceState(null, '', '#' + tableId);
+    }
+
     document.querySelectorAll('.button-group button').forEach(button => {
       button.addEventListener('click', () => {
         const target = button.getAttribute('data-table');
-        document.querySelectorAll('.table-container').forEach(div => {
-          div.classList.add('d-none');
-        });
-        document.getElementById(target).classList.remove('d-none');
+        showTable(target);
       });
+    });
+
+    window.addEventListener('load', () => {
+      const hash = location.hash.replace('#', '');
+      const validTables = ['table1', 'table2', 'table3'];
+      if (validTables.includes(hash)) {
+        showTable(hash);
+      } else {
+        showTable('table1');
+      }
     });
   </script>
 
