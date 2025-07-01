@@ -47,14 +47,24 @@
       border-collapse: collapse;
       width: 100%;
     }
-
+    
     th, td {
       border: 1px solid #dee2e6;
       padding: 8px;
     }
-
+    
     th {
       background-color: #f8f9fa;
+    }
+    
+    @media (max-width: 768px) {
+      table {
+        font-size: 1rem;
+      }
+    
+      th, td {
+        padding: 12px;
+      }
     }
   </style>
 </head>
