@@ -96,11 +96,22 @@
                   a.textContent = cellValue;
                   a.target = '_blank';
                   td.appendChild(a);
-                } else if (cellValue.match(/^\+?\d[\d\s\-\(\)]{5,}$/)) {
-                  const a = document.createElement('a');
-                  a.href = 'tel:' + cellValue.replace(/\s+/g, '');
-                  a.textContent = cellValue;
-                  td.appendChild(a);
+                } else if (cellValue.match(/\+?\d[\d\s\-\(\)]{5,}/)) {
+                  const parts = cellValue.split(/[,/;]+/);
+                  parts.forEach((part, index) => {
+                    const phone = part.trim();
+                    if (phone.match(/^\+?\d[\d\s\-\(\)]{5,}$/)) {
+                      const a = document.createElement('a');
+                      a.href = 'tel:' + phone.replace(/\s+/g, '');
+                      a.textContent = phone;
+                      td.appendChild(a);
+                    } else {
+                      td.appendChild(document.createTextNode(phone));
+                    }
+                    if (index < parts.length - 1) {
+                      td.appendChild(document.createTextNode(', '));
+                    }
+                  });
                 } else {
                   td.textContent = cellValue;
                 }
@@ -119,7 +130,6 @@
         }
       });
     }
-
     loadCSV('data/tab1.csv', 'table1');
     loadCSV('data/tab2.csv', 'table2');
     loadCSV('data/tab3.csv', 'table3');
