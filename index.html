@@ -9,35 +9,65 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
 
   <style>
+    html, body {
+      height: 100%;
+      margin: 0;
+    }
+
+    .page-wrapper {
+      display: flex;
+      flex-direction: column;
+      height: 100%;
+    }
+
+    .header {
+      padding: 1rem;
+    }
+
+    .content {
+      flex: 1 1 auto;
+      overflow-y: auto;
+      padding: 1rem;
+    }
+
     table {
       border-collapse: collapse;
       width: 100%;
     }
+
     th, td {
       border: 1px solid #dee2e6;
       padding: 8px;
     }
+
     th {
       background-color: #f8f9fa;
     }
   </style>
 </head>
-<body class="container py-4">
+<body>
 
-  <h1 class="mb-4">MotoCycling: KB</h1>
+  <div class="page-wrapper">
 
-  <div class="mb-3">
-    <label for="tableSelector" class="form-label">Выберите категорию:</label>
-    <select class="form-select" id="tableSelector">
-      <option value="table1">Эвакуаторы / СТО</option>
-      <option value="table2">Мастерские</option>
-      <option value="table3">Экип</option>
-    </select>
+    <div class="header container">
+      <h1 class="mb-3">MotoCycling: KB</h1>
+      <div class="mb-2">
+        <label for="tableSelector" class="form-label">Выберите категорию:</label>
+        <select class="form-select" id="tableSelector">
+          <option value="table1">Эвакуаторы / СТО</option>
+          <option value="table2">Мастерские</option>
+          <option value="table3">Экип</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="content container-fluid">
+      <div id="table1" class="table-container"></div>
+      <div id="table2" class="table-container d-none"></div>
+      <div id="table3" class="table-container d-none"></div>
+    </div>
+
   </div>
-
-  <div id="table1" class="table-container"></div>
-  <div id="table2" class="table-container d-none"></div>
-  <div id="table3" class="table-container d-none"></div>
 
   <!-- Bootstrap JS -->
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
