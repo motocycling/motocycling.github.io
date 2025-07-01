@@ -63,12 +63,11 @@
   <div class="page-wrapper">
 
     <div class="header container">
-      <h1 class="mb-3">MotoCycling: KB</h1>
-
       <div class="button-group">
-        <button class="btn btn-outline-secondary" data-table="table1">Эвакуаторы / СТО</button>
-        <button class="btn btn-outline-secondary" data-table="table2">Мастерские</button>
-        <button class="btn btn-outline-secondary" data-table="table3">Экип</button>
+        <button class="btn btn-outline-secondary" data-table="emergency">Эвакуаторы / СТО</button>
+        <button class="btn btn-outline-secondary" data-table="parts">Запчасти / расходники</button>
+        <button class="btn btn-outline-secondary" data-table="workshop">Мастерские</button>
+        <button class="btn btn-outline-secondary" data-table="gear">Экип</button>
       </div>
     </div>
 
@@ -154,9 +153,10 @@
       });
     }
 
-    loadCSV('data/tab1.csv', 'table1');
-    loadCSV('data/tab2.csv', 'table2');
-    loadCSV('data/tab3.csv', 'table3');
+    loadCSV('data/emergency.csv', 'emergency');
+    loadCSV('data/parts.csv', 'parts');
+    loadCSV('data/workshop.csv', 'workshop');
+    loadCSV('data/gear.csv', 'gear');
 
     function showTable(tableId) {
       document.querySelectorAll('.table-container').forEach(div => div.classList.add('d-none'));
@@ -182,11 +182,11 @@
 
     window.addEventListener('load', () => {
       const hash = location.hash.replace('#', '');
-      const validTables = ['table1', 'table2', 'table3'];
+      const validTables = ['emergency', 'parts', 'workshop', 'gear'];
       if (validTables.includes(hash)) {
         showTable(hash);
       } else {
-        showTable('table1');
+        showTable('emergency');
       }
     });
   </script>
