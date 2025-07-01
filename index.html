@@ -24,6 +24,19 @@
       padding: 1rem;
     }
 
+    .button-group {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+      margin-bottom: 1rem;
+    }
+
+    .button-group button {
+      flex: 1 1 100%;
+      padding: 1rem;
+      font-size: 1.25rem;
+    }
+
     .content {
       flex: 1 1 auto;
       overflow-y: auto;
@@ -51,13 +64,11 @@
 
     <div class="header container">
       <h1 class="mb-3">MotoCycling: KB</h1>
-      <div class="mb-2">
-        <label for="tableSelector" class="form-label">Выберите категорию:</label>
-        <select class="form-select" id="tableSelector">
-          <option value="table1">Эвакуаторы / СТО</option>
-          <option value="table2">Мастерские</option>
-          <option value="table3">Экип</option>
-        </select>
+
+      <div class="button-group">
+        <button class="btn btn-danger" data-table="table1">Эвакуаторы / СТО</button>
+        <button class="btn btn-primary" data-table="table2">Мастерские</button>
+        <button class="btn btn-success" data-table="table3">Экип</button>
       </div>
     </div>
 
@@ -147,12 +158,14 @@
     loadCSV('data/tab2.csv', 'table2');
     loadCSV('data/tab3.csv', 'table3');
 
-    document.getElementById('tableSelector').addEventListener('change', function () {
-      const selected = this.value;
-      document.querySelectorAll('.table-container').forEach(div => {
-        div.classList.add('d-none');
+    document.querySelectorAll('.button-group button').forEach(button => {
+      button.addEventListener('click', () => {
+        const target = button.getAttribute('data-table');
+        document.querySelectorAll('.table-container').forEach(div => {
+          div.classList.add('d-none');
+        });
+        document.getElementById(target).classList.remove('d-none');
       });
-      document.getElementById(selected).classList.remove('d-none');
     });
   </script>
 
