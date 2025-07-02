@@ -77,7 +77,13 @@
   </div>
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
   <script>
-    let currentTagFilter = { tags: [], elementId: null };
+    const tagFilters = {
+      emergency: [],
+      parts: [],
+      workshop: [],
+      gear: []
+    };
+    let currentElementId = 'emergency';
     const tablesData = {};
 
     function loadCSV(url, elementId) {
@@ -152,12 +158,11 @@
           table.addEventListener('click', function(e) {
             if (e.target.classList.contains('tag')) {
               const tag = e.target.getAttribute('data-tag');
-              if (!currentTagFilter.tags.includes(tag)) {
-                currentTagFilter.tags.push(tag);
-                currentTagFilter.elementId = elementId;
-                filterByTags(table, currentTagFilter.tags);
+              if (!tagFilters[elementId].includes(tag)) {
+                tagFilters[elementId].push(tag);
+                filterByTags(table, tagFilters[elementId]);
                 document.getElementById('clear-filter').classList.remove('d-none');
-                showActiveTags(currentTagFilter.tags);
+                showActiveTags(tagFilters[elementId]);
               }
             }
           });
@@ -207,27 +212,27 @@
     }
 
     function removeTagFromFilter(tag) {
-      const idx = currentTagFilter.tags.indexOf(tag);
+      const idx = tagFilters[currentElementId].indexOf(tag);
       if (idx !== -1) {
-        currentTagFilter.tags.splice(idx, 1);
-        const table = tablesData[currentTagFilter.elementId];
-        if (currentTagFilter.tags.length === 0) {
+        tagFilters[currentElementId].splice(idx, 1);
+        const table = tablesData[currentElementId];
+        if (tagFilters[currentElementId].length === 0) {
           document.getElementById('clear-filter').classList.add('d-none');
           clearActiveTags();
           table.querySelectorAll('tbody tr').forEach(row => row.style.display = '');
         } else {
-          filterByTags(table, currentTagFilter.tags);
-          showActiveTags(currentTagFilter.tags);
+          filterByTags(table, tagFilters[currentElementId]);
+          showActiveTags(tagFilters[currentElementId]);
         }
       }
     }
 
     document.getElementById('clear-filter').addEventListener('click', function() {
-      Object.values(tablesData).forEach(table => {
-        table.querySelectorAll('tbody tr').forEach(row => row.style.display = '');
-      });
+      if (tablesData[currentElementId]) {
+        tablesData[currentElementId].querySelectorAll('tbody tr').forEach(row => row.style.display = '');
+      }
       this.classList.add('d-none');
-      currentTagFilter = { tags: [], elementId: null };
+      tagFilters[currentElementId] = [];
       clearActiveTags();
     });
 
@@ -247,15 +252,15 @@
         }
       });
       history.replaceState(null, '', '#' + tableId);
-      if (currentTagFilter.tags.length && currentTagFilter.elementId === tableId) {
-        filterByTags(tablesData[tableId], currentTagFilter.tags);
+      currentElementId = tableId;
+      if (tagFilters[tableId].length && tablesData[tableId]) {
+        filterByTags(tablesData[tableId], tagFilters[tableId]);
         document.getElementById('clear-filter').classList.remove('d-none');
-        showActiveTags(currentTagFilter.tags);
+        showActiveTags(tagFilters[tableId]);
       } else {
         document.getElementById('clear-filter').classList.add('d-none');
         clearActiveTags();
       }
-      currentTagFilter.elementId = tableId;
     }
 
     document.querySelectorAll('.button-group button').forEach(button => {
