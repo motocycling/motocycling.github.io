@@ -118,36 +118,34 @@
               td.className = 'p-3';
               const cellValue = row[h];
               if (typeof cellValue === 'string') {
-                if (cellValue.startsWith('http://') || cellValue.startsWith('https://')) {
-                  const a = document.createElement('a');
-                  a.href = cellValue;
-                  a.textContent = cellValue;
-                  a.target = '_blank';
-                  td.appendChild(a);
-                } else if (cellValue.match(/\+?\d[\d\s\-\(\)]{5,}/)) {
-                  const parts = cellValue.split(/[,/;]+/);
-                  parts.forEach((part, index) => {
-                    const phone = part.trim();
-                    if (phone.match(/^\+?\d[\d\s\-\(\)]{5,}$/)) {
-                      const a = document.createElement('a');
-                      a.href = 'tel:' + phone.replace(/\s+/g, '');
-                      a.textContent = phone;
-                      td.appendChild(a);
-                    } else {
-                      td.appendChild(document.createTextNode(phone));
-                    }
-                    if (index < parts.length - 1) {
-                      td.appendChild(document.createTextNode(', '));
-                    }
-                  });
-                } else {
-                  const htmlWithTags = cellValue.replace(/(#[\wа-яА-ЯёЁ0-9\-_]+)/g, tag => {
-                    const tagName = tag.substring(1);
-                    const className = 'tag tag-' + tagName.replace(/[^a-zA-Zа-яА-Я0-9\-_]/g, '');
-                    return `<span class="${className}" data-tag="${tag}">${tag}</span>`;
-                  });
-                  td.innerHTML = htmlWithTags;
-                }
+                const parts = cellValue.split(/[,/;]+/);
+                parts.forEach((part, index) => {
+                  const trimmed = part.trim();
+                  if (/^(http:\/\/|https:\/\/)/.test(trimmed)) {
+                    const a = document.createElement('a');
+                    a.href = trimmed;
+                    a.textContent = trimmed;
+                    a.target = '_blank';
+                    td.appendChild(a);
+                  } else if (/^\+?\d[\d\s\-\(\)]{5,}$/.test(trimmed)) {
+                    const a = document.createElement('a');
+                    a.href = 'tel:' + trimmed.replace(/\s+/g, '');
+                    a.textContent = trimmed;
+                    td.appendChild(a);
+                  } else {
+                    const htmlWithTags = trimmed.replace(/(#[\wа-яА-ЯёЁ0-9\-_]+)/g, tag => {
+                      const tagName = tag.substring(1);
+                      const className = 'tag tag-' + tagName.replace(/[^a-zA-Zа-яА-Я0-9\-_]/g, '');
+                      return `<span class="${className}" data-tag="${tag}">${tag}</span>`;
+                    });
+                    const span = document.createElement('span');
+                    span.innerHTML = htmlWithTags;
+                    td.appendChild(span);
+                  }
+                  if (index < parts.length - 1) {
+                    td.appendChild(document.createTextNode(', '));
+                  }
+                });
               } else {
                 td.textContent = cellValue;
               }
