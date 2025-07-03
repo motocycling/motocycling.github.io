@@ -26,13 +26,13 @@
       transition: background 0.2s;
     }
     .tag-эвакуатор { background: #ffcccc; color: #b30000; }
-    .tag-шиномонтаж       { background: #fff6b3; color: #665c00; }
-    .tag-СТО     { background: #d6f5d6; color: #217a21; }
+    .tag-шиномонтаж { background: #fff6b3; color: #665c00; }
+    .tag-СТО { background: #d6f5d6; color: #217a21; }
     .tag-pink { background: #ffe8f0; color: #c94f7c;}
-    .tag-orange    { background: #ffe6cc; color: #b36b00; }
-    .tag-мотошкола      { background: #cce6ff; color: #155fa0; }
+    .tag-orange { background: #ffe6cc; color: #b36b00; }
+    .tag-мотошкола { background: #cce6ff; color: #155fa0; }
     .tag-спицовка { background: #f2e6ff; color: #7c3cc9; }
-    .tag:hover     { outline: 2px solid #333; background: #f6e58d !important; }
+    .tag:hover { outline: 2px solid #333; background: #f6e58d !important; }
     #clear-filter { margin-bottom: 0; }
     #filter-bar { gap: 1rem; margin-bottom: 1rem; }
     #active-tags .tag {
@@ -118,9 +118,9 @@
               td.className = 'p-3';
               const cellValue = row[h];
               if (typeof cellValue === 'string') {
-                const parts = cellValue.split(/[;,]+/);
-                parts.forEach((part, index) => {
-                  const value = part.trim();
+                const parts = cellValue.split(/[;,]+/).map(s => s.trim()).filter(Boolean);
+                const uniqueParts = [...new Set(parts)];
+                uniqueParts.forEach((value, index) => {
                   if (/^https?:\/\/\S+/.test(value)) {
                     const a = document.createElement('a');
                     a.href = value;
@@ -132,18 +132,31 @@
                     a.href = 'tel:' + value.replace(/\s+/g, '');
                     a.textContent = value;
                     td.appendChild(a);
-                  } else if (/^#[\wа-яА-ЯёЁ0-9\-_]+$/.test(value)) {
-                    const tagName = value.substring(1);
-                    const className = 'tag tag-' + tagName.replace(/[^a-zA-Zа-яА-Я0-9\-_]/g, '');
-                    const span = document.createElement('span');
-                    span.className = className;
-                    span.setAttribute('data-tag', value);
-                    span.textContent = value;
-                    td.appendChild(span);
+                  } else if (/#[\wа-яА-ЯёЁ0-9\-_]+/.test(value)) {
+                    let lastIndex = 0;
+                    const tagRegex = /#[\wа-яА-ЯёЁ0-9\-_]+/g;
+                    let match;
+                    while ((match = tagRegex.exec(value)) !== null) {
+                      if (match.index > lastIndex) {
+                        td.appendChild(document.createTextNode(value.slice(lastIndex, match.index)));
+                      }
+                      const tagValue = match[0];
+                      const tagName = tagValue.substring(1);
+                      const className = 'tag tag-' + tagName.replace(/[^a-zA-Zа-яА-Я0-9\-_]/g, '');
+                      const span = document.createElement('span');
+                      span.className = className;
+                      span.setAttribute('data-tag', tagValue);
+                      span.textContent = tagValue;
+                      td.appendChild(span);
+                      lastIndex = tagRegex.lastIndex;
+                    }
+                    if (lastIndex < value.length) {
+                      td.appendChild(document.createTextNode(value.slice(lastIndex)));
+                    }
                   } else {
                     td.appendChild(document.createTextNode(value));
                   }
-                  if (index < parts.length - 1) {
+                  if (index < uniqueParts.length - 1) {
                     td.appendChild(document.createTextNode(', '));
                   }
                 });
