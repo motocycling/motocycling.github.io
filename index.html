@@ -91,6 +91,8 @@
     };
     let currentElementId = 'emergency';
     const tablesData = {};
+    let tablesLoadedCount = 0;
+    const TOTAL_TABLES = 5;
 
     function updateURLWithTags() {
       const table = currentElementId;
@@ -102,6 +104,16 @@
         url.searchParams.delete('tags');
       }
       window.history.replaceState(null, '', url.toString());
+    }
+
+    function applyPendingFilters() {
+      if (tablesLoadedCount === TOTAL_TABLES && tablesData[currentElementId]) {
+        if (tagFilters[currentElementId].length > 0) {
+          filterByTags(tablesData[currentElementId], tagFilters[currentElementId]);
+          document.getElementById('clear-filter').classList.remove('d-none');
+          showActiveTags(tagFilters[currentElementId]);
+        }
+      }
     }
 
     function loadCSV(url, elementId) {
@@ -185,6 +197,8 @@
           container.innerHTML = '';
           container.appendChild(table);
           tablesData[elementId] = table;
+          tablesLoadedCount++;
+          applyPendingFilters();
           table.addEventListener('click', function(e) {
             if (e.target.classList.contains('tag')) {
               const tag = e.target.getAttribute('data-tag');
@@ -287,12 +301,11 @@
       });
       currentElementId = tableId;
       
-      // Apply filters from URL if they exist
-      if (tagFilters[tableId].length && tablesData[tableId]) {
-        filterByTags(tablesData[tableId], tagFilters[tableId]);
-        document.getElementById('clear-filter').classList.remove('d-none');
-        showActiveTags(tagFilters[tableId]);
-      } else {
+      // Apply filters if table is loaded and has pending filters
+      applyPendingFilters();
+      
+      // If no filters, ensure UI is clear
+      if (!tagFilters[tableId].length) {
         document.getElementById('clear-filter').classList.add('d-none');
         clearActiveTags();
       }
