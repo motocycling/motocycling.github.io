@@ -92,6 +92,18 @@
     let currentElementId = 'emergency';
     const tablesData = {};
 
+    function updateURLWithTags() {
+      const table = currentElementId;
+      const tags = tagFilters[currentElementId];
+      const url = new URL(window.location);
+      if (tags.length > 0) {
+        url.searchParams.set('tags', tags.map(t => encodeURIComponent(t)).join(','));
+      } else {
+        url.searchParams.delete('tags');
+      }
+      window.history.replaceState(null, '', url.toString());
+    }
+
     function loadCSV(url, elementId) {
       Papa.parse(url, {
         download: true,
@@ -181,6 +193,7 @@
                 filterByTags(table, tagFilters[elementId]);
                 document.getElementById('clear-filter').classList.remove('d-none');
                 showActiveTags(tagFilters[elementId]);
+                updateURLWithTags();
               }
             }
           });
@@ -242,6 +255,7 @@
           filterByTags(table, tagFilters[currentElementId]);
           showActiveTags(tagFilters[currentElementId]);
         }
+        updateURLWithTags();
       }
     }
 
@@ -252,6 +266,7 @@
       this.classList.add('d-none');
       tagFilters[currentElementId] = [];
       clearActiveTags();
+      updateURLWithTags();
     });
 
     loadCSV('data/emergency.csv', 'emergency');
@@ -270,8 +285,9 @@
           btn.classList.remove('active');
         }
       });
-      history.replaceState(null, '', '#' + tableId);
       currentElementId = tableId;
+      
+      // Apply filters from URL if they exist
       if (tagFilters[tableId].length && tablesData[tableId]) {
         filterByTags(tablesData[tableId], tagFilters[tableId]);
         document.getElementById('clear-filter').classList.remove('d-none');
@@ -280,6 +296,11 @@
         document.getElementById('clear-filter').classList.add('d-none');
         clearActiveTags();
       }
+      
+      // Update hash for table navigation
+      const url = new URL(window.location);
+      url.hash = tableId;
+      window.history.replaceState(null, '', url.toString());
     }
 
     document.querySelectorAll('.button-group button').forEach(button => {
@@ -290,13 +311,27 @@
     });
 
     window.addEventListener('load', () => {
-      const hash = location.hash.replace('#', '');
+      const url = new URL(window.location);
+      const hash = url.hash.replace('#', '');
+      const tagsParam = url.searchParams.get('tags');
+      
+      // Determine which table to show
       const validTables = ['emergency', 'parts', 'workshop', 'gear', 'dealers'];
-      if (validTables.includes(hash)) {
-        showTable(hash);
-      } else {
-        showTable('emergency');
+      const tableId = validTables.includes(hash) ? hash : 'emergency';
+      
+      // Parse tags from URL if they exist
+      if (tagsParam) {
+        const tags = tagsParam.split(',').map(t => {
+          try {
+            return decodeURIComponent(t);
+          } catch(e) {
+            return t;
+          }
+        });
+        tagFilters[tableId] = tags;
       }
+      
+      showTable(tableId);
     });
   </script>
 </body>
